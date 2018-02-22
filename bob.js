@@ -8,7 +8,7 @@ const BtpPlugin = require('ilp-plugin-btp')
 
 const connectorAddress = 'demo.connector.kava.io'
 
-const fulfillment = Buffer.alloc(32, 'a random string') // Pre-images need to by 32 byte buffers.
+const fulfillment = Buffer.alloc(32, 'a random string') // Pre-images need to be 32 byte buffers.
 
 
 function fulfillmentToCondition (preimage) {
