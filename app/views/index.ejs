@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Test</title>
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
+  </head>
+  <body>
+    <div class="container">
+      <fieldset>
+        <form action="/" method="post">
+          <input name="amount" type="text" class="ghost-input" placeholder="Enter an amount to send." required>
+          <select name="from" class="ghost-input" required>
+            <option selected>PayPal</option>
+            <option>Venmo</option>
+          </select>
+          <select name="to" class="ghost-input" required>
+            <option>PayPal</option>
+            <option selected>Venmo</option>
+          </select>
+          <input type="submit" class="ghost-button" value="Send Transfer">
+        </form>
+        <% if (result !== null) { %>
+        <p><%= result %></p>
+        <% } %>
+      </fieldset>
+    </div>
+  </body>
+</html>
