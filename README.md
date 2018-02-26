@@ -1,5 +1,17 @@
 # P2P Wallets Demo
 
+## /app
+
+Super basic web app. Doesn't send payment yet.
+
+To run:
+
+ 1. `npm install`
+ - `npm start`
+ - Then go to http://localhost:3000
+
+## /examples
+
 This contains a minimal script to send an ILP payment and display what's going on.
 
 To run it do this:

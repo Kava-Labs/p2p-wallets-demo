@@ -2,8 +2,9 @@
   "name": "p2p-wallets-demo",
   "version": "0.1.0",
   "description": "A demo to send money between p2p wallets.",
-  "main": "index.js",
+  "main": "app/server.js",
   "scripts": {
+		"start": "node app/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
