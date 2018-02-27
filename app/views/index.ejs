@@ -11,13 +11,21 @@
       <fieldset>
         <form action="/" method="post">
           <input name="amount" type="text" class="ghost-input" placeholder="Enter an amount to send." required>
+          <label for="from">Sending From</label>
           <select name="from" class="ghost-input" required>
             <option selected>PayPal</option>
             <option>Venmo</option>
           </select>
+          <input name="send_account" type="text" class="ghost-input" placeholder="Sender's Account" required>
+          <label for="to">Sending To</label>
           <select name="to" class="ghost-input" required>
             <option>PayPal</option>
             <option selected>Venmo</option>
+          </select>
+          <input name="receive_account" type="text" class="ghost-input" placeholder="Receiver's Account" required>
+          <label for="currency">Currency</label>
+          <select name="currency" class="ghost-input" required>
+            <option selected>USD</option>
           </select>
           <input type="submit" class="ghost-button" value="Send Transfer">
         </form>

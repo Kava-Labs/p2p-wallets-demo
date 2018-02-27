@@ -4,7 +4,7 @@
   "description": "A demo to send money between p2p wallets.",
   "main": "app/server.js",
   "scripts": {
-		"start": "node app/server.js",
+    "start": "node app/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
