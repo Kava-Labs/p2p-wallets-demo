@@ -24,7 +24,7 @@ app.post('/', function (req, res) {
   console.log(req.body.amount);
   console.log('sending payment');
 	// TODO trigger an ILP payment
-	res.render('payment-processing');  
+	res.render('payment-processing', {from: req.body.from, to: req.body.to});  
 })
 
 
