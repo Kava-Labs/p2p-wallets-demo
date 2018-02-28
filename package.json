@@ -20,6 +20,7 @@
   "dependencies": {
     "ejs": "^2.5.7",
     "express": "^4.16.2",
+    "express-basic-auth": "^1.1.4",
     "ilp-packet": "^2.1.2",
     "ilp-plugin-btp": "^1.1.8"
   }
