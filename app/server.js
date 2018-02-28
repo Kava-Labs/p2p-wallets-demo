@@ -1,6 +1,7 @@
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
+const PORT = process.env.PORT || 5000 // default `heroku local` port
 const app = express()
 
 
@@ -28,6 +29,6 @@ app.post('/', function (req, res) {
 })
 
 
-app.listen(3000, function () {
-  console.log('Example app listening on port 3000!')
+app.listen(PORT, function () {
+  console.log(`Example app listening on port ${PORT}!`)
 })
