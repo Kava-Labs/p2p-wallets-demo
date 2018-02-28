@@ -1,38 +1,68 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <title>Kava Connector</title>
     <meta charset="utf-8">
-    <title>Test</title>
+    <!-- Bootstrap things: -->
+    <meta name="viewport" content="width=device-width, initial-scale=1"> 
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/4.0.0/cosmo/bootstrap.min.css">
+    <!--link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <!-- Custom CSS -->
     <link rel="stylesheet" type="text/css" href="/css/style.css">
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
   </head>
   <body>
-    <div class="container">
-      <fieldset>
+    
+    <nav class="navbar text-white sticky-top">
+      <a class="navbar-brand text-white" href="#">
+        <img src="/img/kava-logo-white.png" width="102" height="30" class="d-inline-block align-baseline mr-1" alt="">
+        Connector
+      </a>
+    </nav>
+    
+    <div class="card mx-auto m-3" style="width: 18rem;">
+      <div class="card-body">
         <form action="/" method="post">
-          <input name="amount" type="text" class="ghost-input" placeholder="Enter an amount to send." required>
-          <label for="from">Sending From</label>
-          <select name="from" class="ghost-input" required>
-            <option selected>PayPal</option>
-            <option>Venmo</option>
-          </select>
-          <input name="send_account" type="text" class="ghost-input" placeholder="Sender's Account" required>
-          <label for="to">Sending To</label>
-          <select name="to" class="ghost-input" required>
-            <option>PayPal</option>
-            <option selected>Venmo</option>
-          </select>
-          <input name="receive_account" type="text" class="ghost-input" placeholder="Receiver's Account" required>
-          <label for="currency">Currency</label>
-          <select name="currency" class="ghost-input" required>
-            <option selected>USD</option>
-          </select>
-          <input type="submit" class="ghost-button" value="Send Transfer">
+          <div class="form-group row">
+            <label for="amount" class="col-3 col-form-label">Send</label>
+            <div class="col-9">
+              <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">$</span>
+                </div>
+                <input name="amount" type="text" class="form-control" id="amount" placeholder="0.00">
+              </div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="from" class="col-3 col-form-label">From</label>
+            <div class="col-9">
+              <select name="from" class="custom-select" id="from">
+                <option value="paypal">Paypal</option>
+                <option value="venmo" selected>Venmo</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="to" class="col-3 col-form-label">To</label>
+            <div class="col-9">
+              <select name="to" class="custom-select" id="to">
+                <option value="paypal" selected>Paypal</option>
+                <option value="venmo">Venmo</option>
+              </select>
+            </div>
+            
+          </div>
+          <button type="submit" class="btn btn-success btn-block">Send Transfer</button>
         </form>
-        <% if (result !== null) { %>
-        <p><%= result %></p>
-        <% } %>
-      </fieldset>
+      </div>
     </div>
+    
+    <footer class="container-fluid text-white text-center fixed-bottom">
+      <p class="mt-2">Kava Labs, Inc.</p>
+    </footer>
+
   </body>
 </html>
