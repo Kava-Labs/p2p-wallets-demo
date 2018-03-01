@@ -12,7 +12,7 @@ const {Builder, By, Key, until} = require('selenium-webdriver');
 const Chrome = require('selenium-webdriver/chrome');
 //var path = require('chromedriver').path;
 const CHROME_EXECUTABLE = process.env.GOOGLE_CHROME_SHIM
-
+console.log(`google_chrome_shim:${process.env.GOOGLE_CHROME_SHIM}, google_chrom_bin:${process.env.GOOGLE_CHROME_BIN}`)
 //These are needed when using the chromedriver npm package. Switching to using brew chromedriver for now.
 //var service = new Chrome.ServiceBuilder(path).build();
 //Chrome.setDefaultService(service);
@@ -41,6 +41,7 @@ class VenmoAPI {
 			options = options.headless().windowSize({width: 640, height: 480})
 		}
 		if (CHROME_EXECUTABLE) {
+			console.log('Changing chrome path.')
 			options = options.setChromeBinaryPath(CHROME_EXECUTABLE)
 		}
 		
