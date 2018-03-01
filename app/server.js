@@ -12,7 +12,7 @@ const client_id = process.env.PAYPAL_CLIENT_ID
 const client_secret = process.env.PAYPAL_CLIENT_SECRET
 
 // Venmo info
-const VenmoAPI = require('../../ilp-plugin-venmo/venmo-api.js')
+const VenmoAPI = require('./venmo-api')
 // Define these in your PATH
 const venmo_email = process.env.VENMO_EMAIL
 const venmo_pass = process.env.VENMO_PASS
