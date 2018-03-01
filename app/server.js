@@ -20,7 +20,9 @@ app.get('/login', function (req, res) {
 
 app.post('/', function (req, res) {
   console.log(req.body.from);
+  console.log(req.body.send_account)
   console.log(req.body.to);
+  console.log(req.body.receive_account)
   console.log(req.body.amount);
   console.log('sending payment');
 	// TODO trigger an ILP payment
