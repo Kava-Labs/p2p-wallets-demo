@@ -18,7 +18,6 @@
   },
   "homepage": "https://github.com/Kava-Labs/p2p-wallets-demo#readme",
   "dependencies": {
-    "chromedriver": "^2.35.0",
     "ejs": "^2.5.7",
     "express": "^4.16.2",
     "express-basic-auth": "^1.1.4",

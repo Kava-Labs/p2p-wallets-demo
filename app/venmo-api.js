@@ -10,10 +10,12 @@ Nice tutorial on unreliability of the wait() function https://medium.freecodecam
 
 const {Builder, By, Key, until} = require('selenium-webdriver');
 const Chrome = require('selenium-webdriver/chrome');
-var path = require('chromedriver').path;
+//var path = require('chromedriver').path;
+const CHROME_EXECUTABLE = process.env.GOOGLE_CHROME_SHIM
 
-var service = new Chrome.ServiceBuilder(path).build();
-Chrome.setDefaultService(service);
+//These are needed when using the chromedriver npm package. Switching to using brew chromedriver for now.
+//var service = new Chrome.ServiceBuilder(path).build();
+//Chrome.setDefaultService(service);
 
 
 class VenmoAPI {
@@ -37,6 +39,9 @@ class VenmoAPI {
 		let options = new Chrome.Options()
 		if (headless) {
 			options = options.headless().windowSize({width: 640, height: 480})
+		}
+		if (CHROME_EXECUTABLE) {
+			options = options.setChromeBinaryPath(CHROME_EXECUTABLE)
 		}
 		
 		this.driver = await new Builder()
