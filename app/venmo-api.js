@@ -12,7 +12,7 @@ const {Builder, By, Key, until} = require('selenium-webdriver');
 const Chrome = require('selenium-webdriver/chrome');
 //var path = require('chromedriver').path;
 const CHROME_EXECUTABLE = process.env.GOOGLE_CHROME_SHIM
-console.log(`google_chrome_shim:${process.env.GOOGLE_CHROME_SHIM}, google_chrom_bin:${process.env.GOOGLE_CHROME_BIN}`)
+
 //These are needed when using the chromedriver npm package. Switching to using brew chromedriver for now.
 //var service = new Chrome.ServiceBuilder(path).build();
 //Chrome.setDefaultService(service);
@@ -30,12 +30,14 @@ class VenmoAPI {
 		await this.driver.get('https://venmo.com/account/sign-in');
 		await this.driver.findElement(By.name('phoneEmailUsername')).sendKeys(this.username);
 		let passwordBox = await this.driver.findElement(By.name('password'));
+		console.log(`password box:${passwordBox}`)
 		await passwordBox.sendKeys(this.password)
 		await passwordBox.submit();
 		this.lastLogInTime = Date.now()
 	}
 	
 	async connect(headless=true) {
+		console.log(`google_chrome_shim:${process.env.GOOGLE_CHROME_SHIM}, google_chrom_bin:${process.env.GOOGLE_CHROME_BIN}`)
 		let options = new Chrome.Options()
 		if (headless) {
 			options = options.headless().windowSize({width: 640, height: 480})
