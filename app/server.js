@@ -105,12 +105,15 @@ function requestMoneyPaypal(api, receiver_email, amount, currency='USD') {
 async function sendMoneyVenmo(
         api_email, api_pass, destinationUsername, amount) {
     let venmo = await new VenmoAPI(api_email, api_pass)
+    console.log('Connecting venmo API.')
     await venmo.connect()
+    console.log('Getting venmo balance.')
     let balance = await venmo.getBalance()
     if (balance < amount) {
         console.log("Insufficient funds.")
         return
     }
+    console.log('Sending money by venmo.')
     await venmo.sendMoney(destinationUsername, amount)
     await venmo.disconnect()
 }
