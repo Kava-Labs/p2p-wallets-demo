@@ -124,7 +124,8 @@ app.set('views',path.resolve(__dirname + '/views'))
 app.use(basicAuth({
 	users: {
 		'ruaridh': process.env.RUARIDHS_PASSWORD,
-		'kevin': process.env.KEVINS_PASSWORD},
+		'kevin': process.env.KEVINS_PASSWORD,
+        'kava': process.env.KAVA_PASSWORD},
 	challenge: true,
 	realm: 'PRunzwXZhi4UFhWuwCTAwGZ',
 }))
