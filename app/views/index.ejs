@@ -20,6 +20,9 @@
         <img src="/img/kava-logo-white.png" width="102" height="30" class="d-inline-block align-baseline mr-1" alt="">
         Connector
       </a>
+      <span class="navbar-text text-capitalize">
+        <%= user %>
+      </span>
     </nav>
     
     <div class="card mx-auto m-3" style="width: 18rem;">
@@ -38,20 +41,22 @@
           </div>
           <div class="form-group row">
             <label for="from" class="col-3 col-form-label">From</label>
-            <div class="col-9">
+            <div class="col-12">
               <select name="from" class="custom-select" id="from">
-                <option value="paypal">Paypal</option>
-                <option value="venmo" selected>Venmo</option>
+                <option value="paypal" selected>Paypal</option>
+                <option value="venmo">Venmo</option>
               </select>
+              <input name="send_account" type="text" class="form-control" id="send_account" placeholder="Sender's Account">
             </div>
           </div>
           <div class="form-group row">
             <label for="to" class="col-3 col-form-label">To</label>
-            <div class="col-9">
+            <div class="col-12">
               <select name="to" class="custom-select" id="to">
-                <option value="paypal" selected>Paypal</option>
-                <option value="venmo">Venmo</option>
+                <option value="paypal">Paypal</option>
+                <option value="venmo" selected>Venmo</option>
               </select>
+              <input name="receive_account" type="text" class="form-control" id="receive_account" placeholder="Receiver's Account">
             </div>
             
           </div>
