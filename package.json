@@ -21,6 +21,8 @@
     "ejs": "^2.5.7",
     "express": "^4.16.2",
     "ilp-packet": "^2.1.2",
-    "ilp-plugin-btp": "^1.1.8"
+    "ilp-plugin-btp": "^1.1.8",
+    "paypal-rest-sdk": "^1.8.1",
+    "selenium-webdriver": "^4.0.0-alpha.1"
   }
 }
