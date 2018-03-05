@@ -35,25 +35,26 @@ class VenmoAPI {
     this.driver.takeScreenshot().then(function (base64Image) {
         var decodedImage = new Buffer(base64Image, 'base64');
         fs.writeFile('before_login.jpg', decodedImage, function(err) {});
-        console.log('Took before log in screenshot');
+        debug(`Took before log in screenshot ${new Date()}`);
     });
     
-		let passwordBox = await this.driver.findElement(By.name('password'));
+		let passwordBox = await this.driver.wait(until.elementLocated(By.name('password')),5000);
 		await passwordBox.sendKeys(this.password)
+    await this.driver.sleep(1000)
 		await passwordBox.submit();
-    debug('submitted log in information')
+    debug(`submitted log in information ${new Date()}`)
     //wait to see which page it ends up at. Check url.
     try {
       await this.driver.wait(until.elementLocated(By.linkText('Log out')),5000)
     } catch (e) {
       // ignore timeout errors
-      debug('timed out waiting for log in link')
+      debug(`timed out waiting for log in link ${new Date()}`)
     }
     
     this.driver.takeScreenshot().then(function (base64Image) {
         var decodedImage = new Buffer(base64Image, 'base64');
         fs.writeFile('after_login.jpg', decodedImage, function(err) {});
-        console.log('Took after log in screenshot');
+        debug('Took after log in screenshot');
     });
     
     let url = await this.driver.getCurrentUrl()
