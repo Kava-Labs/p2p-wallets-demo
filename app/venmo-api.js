@@ -46,7 +46,7 @@ class VenmoAPI {
     debug(`submitted log in information ${new Date()}`)
     //wait to see which page it ends up at. Check url.
     try {
-      await this.driver.wait(until.elementLocated(By.linkText('Log out')),5000)
+      await this.driver.wait(until.elementLocated(By.linkText('Log out')),3000)
     } catch (e) {
       // ignore timeout errors
       debug(`timed out waiting for log in link ${new Date()}`)
