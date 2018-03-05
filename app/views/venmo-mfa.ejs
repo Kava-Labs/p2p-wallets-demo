@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Kava Connector</title>
+    <meta charset="utf-8">
+    <!-- Bootstrap things: -->
+    <meta name="viewport" content="width=device-width, initial-scale=1"> 
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/4.0.0/cosmo/bootstrap.min.css">
+    <!--link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+  </head>
+  <body>
+    
+    <nav class="navbar text-white sticky-top">
+      <a class="navbar-brand text-white" href="#">
+        <img src="/img/kava-logo-white.png" width="102" height="30" class="d-inline-block align-baseline mr-1" alt="">
+        Connector
+      </a>
+    </nav>
+    
+    <div class="card mx-auto m-3" style="width: 27rem;">
+      <div class="card-body">
+          <form action="/venmo-mfa" method="post">
+            <div class="form-group row">
+                <label for="auth_code" class="col-3 col-form-label">Code</label>
+                <div class="col-9">
+                  <input name="auth_code" type="text" class="form-control" id="auth_code" placeholder="Authentication Code">
+                </div>
+              </div>
+            <button type="submit" class="btn btn-primary btn-block">Submit</button>
+          </form>
+        </div>
+    </div>
+    
+    <footer class="container-fluid text-white text-center fixed-bottom">
+      <p class="mt-2">Kava Labs, Inc.</p>
+    </footer>
+
+  </body>
+</html>

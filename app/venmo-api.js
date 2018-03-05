@@ -33,8 +33,50 @@ class VenmoAPI {
 		console.log(`password box:${passwordBox}`)
 		await passwordBox.sendKeys(this.password)
 		await passwordBox.submit();
-		this.lastLogInTime = Date.now()
+    //wait to see which page it ends up at. Check url.
+    try {
+      await this.driver.wait(until.elementLocated(By.linkText('Log out')),5000)
+    } catch (e) {
+      // ignore timeout errors
+    }
+    let url = await this.driver.getCurrentUrl()
+    console.log(url)
+    if (url.toString() == 'https://venmo.com/account/mfa/verify-phone-email') {
+      console.log('Venmo requires 2 factor authorization.')
+      throw 'mfa error'
+    } else {
+      // if mfa then throw else continue
+      this.lastLogInTime = Date.now()
+    }
 	}
+  
+  async send2FactorCode() {
+    // assumes it's already at the right page
+    //await this.driver.get('https://venmo.com/account/mfa/code-prompt')
+    await this.driver.findElement(By.css('button.mfa-button-code-prompt')).click()
+  }
+  
+  async submit2FactorAuth(authCode) {
+    // assumes it's already at the right page
+    let authCodeElement = await this.driver.wait(
+			until.elementLocated(By.name('token')),10000); //also class=auth-form-input
+    await authCodeElement.sendKeys(authCode);
+    await authCodeElement.submit();
+    
+    // Wait for a few seconds to avoid stale element error. TODO Find proper way of waiting. https://stackoverflow.com/questions/5709204/random-element-is-no-longer-attached-to-the-dom-staleelementreferenceexception
+    try {
+      await this.driver.wait(until.elementLocated(By.name('rhubarb')),5000)
+    } catch (e) {
+      //do nothing
+    }
+    
+    let rememberButton = await this.driver.wait(
+			until.elementLocated(By.css('button.auth-button')),10000);
+    
+    console.log('found button, clicking..')
+    await rememberButton.click()
+    //await login()
+  }
 	
 	async connect(headless=true) {
 		console.log(`google_chrome_shim:${process.env.GOOGLE_CHROME_SHIM}, google_chrom_bin:${process.env.GOOGLE_CHROME_BIN}`)
@@ -46,6 +88,7 @@ class VenmoAPI {
 			console.log('Changing chrome path.')
 			options = options.setChromeBinaryPath(CHROME_EXECUTABLE)
 		}
+    //options = options.addArguments("--incognito");
 		
 		this.driver = await new Builder()
 			.forBrowser('chrome')

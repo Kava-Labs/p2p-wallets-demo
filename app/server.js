@@ -17,6 +17,8 @@ const VenmoAPI = require('./venmo-api')
 const venmo_email = process.env.VENMO_EMAIL
 const venmo_pass = process.env.VENMO_PASS
 
+const venmo = new VenmoAPI(venmo_email, venmo_pass)
+
 paypal.configure({
   'mode': 'live', //sandbox or live
   'client_id': client_id,
@@ -102,11 +104,14 @@ function requestMoneyPaypal(api, receiver_email, amount, currency='USD') {
     });
 }
 
-async function sendMoneyVenmo(
-        api_email, api_pass, destinationUsername, amount) {
-    let venmo = await new VenmoAPI(api_email, api_pass)
+async function sendMoneyVenmo(destinationUsername, amount) {
     console.log('Connecting venmo API.')
-    await venmo.connect()
+    try {
+      await venmo.connect(false)
+    } catch (e/* if e == 'mfa error'*/){ // TODO better way of doing this?
+      console.log(`Couldn't connect to venmo: ${e}`)
+      return
+    }
     console.log('Getting venmo balance.')
     let balance = await venmo.getBalance()
     if (balance < amount) {
@@ -115,7 +120,7 @@ async function sendMoneyVenmo(
     }
     console.log('Sending money by venmo.')
     await venmo.sendMoney(destinationUsername, amount)
-    await venmo.disconnect()
+    // await venmo.disconnect() TODO disconnect on shutdown somehow
 }
 
 
@@ -154,13 +159,23 @@ app.post('/', function (req, res) {
   // Naive way of sending payments:
   if (req.body.from == 'paypal' && req.body.amount < 1.0) {
     console.log("Sending venmo payment")
-    sendMoneyVenmo(venmo_email, venmo_pass, req.body.receive_account, req.body.amount)
+    sendMoneyVenmo(req.body.receive_account, req.body.amount)
     console.log("Requesting paypal payment")
     requestMoneyPaypal(paypal, req.body.send_account, req.body.amount)
     }
   console.log('sending payment');
 	// TODO trigger an ILP payment
 	res.render('payment-processing', {from: req.body.from, to: req.body.to, user: req.auth.user});  
+})
+
+app.get('/venmo-mfa', function (req, res) {
+  venmo.send2FactorCode()
+  res.render('venmo-mfa');})
+
+app.post('/venmo-mfa', function (req, res) {
+  console.log(req.body.auth_code)
+  venmo.submit2FactorAuth(req.body.auth_code)
+  res.redirect('/');
 })
 
 
