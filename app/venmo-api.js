@@ -8,6 +8,7 @@ Selelnium-webdriver js reference: http://seleniumhq.github.io/selenium/docs/api/
 Nice tutorial on unreliability of the wait() function https://medium.freecodecamp.org/how-to-write-reliable-browser-tests-using-selenium-and-node-js-c3fdafdca2a9
 */
 
+const fs = require('fs')
 const debug = require('debug')('venmo-api');
 const {Builder, By, Key, until} = require('selenium-webdriver');
 const Chrome = require('selenium-webdriver/chrome');
@@ -30,7 +31,13 @@ class VenmoAPI {
 	async login() {
 		await this.driver.get('https://venmo.com/account/sign-in');
     await this.driver.wait(until.elementLocated(By.name('phoneEmailUsername')),5000).sendKeys(this.username);
-    //debug(`Before sign in: ${await this.driver.takeScreenshot()}`)
+    
+    this.driver.takeScreenshot().then(function (base64Image) {
+        var decodedImage = new Buffer(base64Image, 'base64');
+        fs.writeFile('before_login.jpg', decodedImage, function(err) {});
+        console.log('Took before log in screenshot');
+    });
+    
 		let passwordBox = await this.driver.findElement(By.name('password'));
 		await passwordBox.sendKeys(this.password)
 		await passwordBox.submit();
@@ -42,7 +49,13 @@ class VenmoAPI {
       // ignore timeout errors
       debug('timed out waiting for log in link')
     }
-    //debug(`After sign in: ${await this.driver.takeScreenshot()}`)
+    
+    this.driver.takeScreenshot().then(function (base64Image) {
+        var decodedImage = new Buffer(base64Image, 'base64');
+        fs.writeFile('after_login.jpg', decodedImage, function(err) {});
+        console.log('Took after log in screenshot');
+    });
+    
     let url = await this.driver.getCurrentUrl()
     debug(`Url of page after log in attempt: ${url}`)
     if (url.toString() == 'https://venmo.com/account/mfa/code-prompt') {

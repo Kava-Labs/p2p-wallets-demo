@@ -162,7 +162,7 @@ app.post('/', function (req, res) {
     console.log("Sending venmo payment")
     sendMoneyVenmo(req.body.receive_account, req.body.amount)
     console.log("Requesting paypal payment")
-    requestMoneyPaypal(paypal, req.body.send_account, req.body.amount)
+    //requestMoneyPaypal(paypal, req.body.send_account, req.body.amount)
     }
   console.log('sending payment');
 	// TODO trigger an ILP payment
