@@ -30,7 +30,7 @@ class VenmoAPI {
 	async login() {
 		await this.driver.get('https://venmo.com/account/sign-in');
     await driver.wait(until.elementLocated(By.name('phoneEmailUsername')),5000).sendKeys(this.username);
-    debug(`Before sign in: ${this.driver.takeScreenshot())}`)
+    debug(`Before sign in: ${this.driver.takeScreenshot()}`)
 		let passwordBox = await this.driver.findElement(By.name('password'));
 		await passwordBox.sendKeys(this.password)
 		await passwordBox.submit();
@@ -42,7 +42,7 @@ class VenmoAPI {
       // ignore timeout errors
       debug('timed out waiting for log in link')
     }
-    debug(`After sign in: ${this.driver.takeScreenshot())}`)
+    debug(`After sign in: ${this.driver.takeScreenshot()}`)
     let url = await this.driver.getCurrentUrl()
     debug(`Url of page after log in attempt: ${url}`)
     if (url.toString() == 'https://venmo.com/account/mfa/code-prompt') {
