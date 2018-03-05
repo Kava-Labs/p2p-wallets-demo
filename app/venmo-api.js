@@ -111,13 +111,15 @@ class VenmoAPI {
     debug(`google_chrome_shim:${process.env.GOOGLE_CHROME_SHIM}, google_chrom_bin:${process.env.GOOGLE_CHROME_BIN}`)
 		let options = new Chrome.Options()
 		if (headless) {
-			options = options.headless().windowSize({width: 640, height: 480})
+			options.headless().windowSize({width: 640, height: 480})
 		}
 		if (CHROME_EXECUTABLE) {
 			debug('changing chrome path')
-			options = options.setChromeBinaryPath(CHROME_EXECUTABLE)
+			options.setChromeBinaryPath(CHROME_EXECUTABLE)
 		}
-    //options = options.addArguments("--incognito");
+    const safeUserAgent='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36'
+    opts.add_argument(`user-agent="${safeUserAgent}"`)
+    // with headless chrome, UA is 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/64.0.3282.186 Safari/537.36'
 		
 		this.driver = await new Builder()
 			.forBrowser('chrome')
