@@ -118,7 +118,7 @@ class VenmoAPI {
 			options.setChromeBinaryPath(CHROME_EXECUTABLE)
 		}
     const safeUserAgent='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36'
-    opts.add_argument(`user-agent="${safeUserAgent}"`)
+    options.addArguments(`user-agent="${safeUserAgent}"`)
     // with headless chrome, UA is 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/64.0.3282.186 Safari/537.36'
 		
 		this.driver = await new Builder()
