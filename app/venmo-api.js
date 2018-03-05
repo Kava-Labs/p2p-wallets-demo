@@ -32,15 +32,16 @@ class VenmoAPI {
 		await this.driver.get('https://venmo.com/account/sign-in');
     await this.driver.wait(until.elementLocated(By.name('phoneEmailUsername')),5000).sendKeys(this.username);
     
+		let passwordBox = await this.driver.wait(until.elementLocated(By.name('password')),5000);
+		await passwordBox.sendKeys(this.password)
+    await this.driver.sleep(1000)
+    
     this.driver.takeScreenshot().then(function (base64Image) {
         var decodedImage = new Buffer(base64Image, 'base64');
         fs.writeFile('before_login.jpg', decodedImage, function(err) {});
         debug(`Took before log in screenshot ${new Date()}`);
     });
     
-		let passwordBox = await this.driver.wait(until.elementLocated(By.name('password')),5000);
-		await passwordBox.sendKeys(this.password)
-    await this.driver.sleep(1000)
 		await passwordBox.submit();
     debug(`submitted log in information ${new Date()}`)
     //wait to see which page it ends up at. Check url.
