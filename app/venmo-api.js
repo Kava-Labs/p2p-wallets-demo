@@ -30,6 +30,14 @@ class VenmoAPI {
 	
 	async login() {
 		await this.driver.get('https://venmo.com/account/sign-in');
+    
+    this.driver.sleep(3000);
+    this.driver.takeScreenshot().then(function (base64Image) {
+        var decodedImage = new Buffer(base64Image, 'base64');
+        fs.writeFile('after_login_load.jpg', decodedImage, function(err) {});
+        debug(`Took screenshot after log in page loaded ${new Date()}`);
+    });
+    
     await this.driver.wait(until.elementLocated(By.name('phoneEmailUsername')),5000).sendKeys(this.username);
     
 		let passwordBox = await this.driver.wait(until.elementLocated(By.name('password')),5000);
