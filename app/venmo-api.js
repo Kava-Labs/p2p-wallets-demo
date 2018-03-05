@@ -55,6 +55,12 @@ class VenmoAPI {
   async send2FactorCode() {
     // assumes it's already at the right page
     //await this.driver.get('https://venmo.com/account/mfa/code-prompt')
+    try {
+      debug('logging in in order to send mfa code')
+      await login()
+    } catch (e) {
+      // ignore mfa error
+    }
     debug('finding send mfa code button and clicking it')
     await this.driver.findElement(By.css('button.mfa-button-code-prompt')).click()
   }
