@@ -1,3 +1,4 @@
+const debug = require('debug')('server');
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');

@@ -8,6 +8,7 @@ Selelnium-webdriver js reference: http://seleniumhq.github.io/selenium/docs/api/
 Nice tutorial on unreliability of the wait() function https://medium.freecodecamp.org/how-to-write-reliable-browser-tests-using-selenium-and-node-js-c3fdafdca2a9
 */
 
+const debug = require('debug')('venmo-api');
 const {Builder, By, Key, until} = require('selenium-webdriver');
 const Chrome = require('selenium-webdriver/chrome');
 //var path = require('chromedriver').path;
@@ -30,17 +31,18 @@ class VenmoAPI {
 		await this.driver.get('https://venmo.com/account/sign-in');
 		await this.driver.findElement(By.name('phoneEmailUsername')).sendKeys(this.username);
 		let passwordBox = await this.driver.findElement(By.name('password'));
-		console.log(`password box:${passwordBox}`)
 		await passwordBox.sendKeys(this.password)
 		await passwordBox.submit();
+    debug('submitted log in information')
     //wait to see which page it ends up at. Check url.
     try {
       await this.driver.wait(until.elementLocated(By.linkText('Log out')),5000)
     } catch (e) {
       // ignore timeout errors
+      debug('timed out waiting for log in link')
     }
     let url = await this.driver.getCurrentUrl()
-    console.log(url)
+    debug(`Url of page after log in attempt: ${url}`)
     if (url.toString() == 'https://venmo.com/account/mfa/verify-phone-email') {
       console.log('Venmo requires 2 factor authorization.')
       throw 'mfa error'
@@ -53,6 +55,7 @@ class VenmoAPI {
   async send2FactorCode() {
     // assumes it's already at the right page
     //await this.driver.get('https://venmo.com/account/mfa/code-prompt')
+    debug('finding send mfa code button and clicking it')
     await this.driver.findElement(By.css('button.mfa-button-code-prompt')).click()
   }
   
