@@ -36,6 +36,7 @@ class VenmoAPI {
 		await passwordBox.sendKeys(this.password)
     await this.driver.sleep(1000)
     
+    debug(`user agent: ${await this.driver.executeScript("return navigator.userAgent")}`)
     this.driver.takeScreenshot().then(function (base64Image) {
         var decodedImage = new Buffer(base64Image, 'base64');
         fs.writeFile('before_login.jpg', decodedImage, function(err) {});
