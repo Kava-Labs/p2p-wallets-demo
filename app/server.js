@@ -159,10 +159,13 @@ app.post('/', function (req, res) {
   console.log(req.body.amount);
   // Naive way of sending payments:
   if (req.body.from == 'paypal' && req.body.amount < 1.0) {
-    console.log("Sending venmo payment")
-    sendMoneyVenmo(req.body.receive_account, req.body.amount)
     console.log("Requesting paypal payment")
     requestMoneyPaypal(paypal, req.body.send_account, req.body.amount)
+    // wait a bit before sending venmo payment
+    setTimeout(() => {
+      console.log("Sending venmo payment")
+      sendMoneyVenmo(req.body.receive_account, req.body.amount)
+    },10000)
     }
   console.log('sending payment');
 	// TODO trigger an ILP payment
