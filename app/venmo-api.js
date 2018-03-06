@@ -31,35 +31,36 @@ class VenmoAPI {
 	
 	async login() {
 		await this.driver.get('https://venmo.com/account/sign-in');
-    
-    await this.driver.sleep(10000);
+
+    await this.driver.sleep(3000); //TODO replace with `wait(until.titleIs` to detect when page has loaded
+
     this.driver.takeScreenshot().then(function (base64Image) {
         var decodedImage = new Buffer(base64Image, 'base64');
         fs.writeFile('after_login_load.jpg', decodedImage, function(err) {});
-        debug(`Took screenshot after log in page loaded ${new Date()}`);
+        debug('Took screenshot after log in page loaded');
     });
     
     await this.driver.wait(until.elementLocated(By.name('phoneEmailUsername')),5000).sendKeys(this.username);
     
 		let passwordBox = await this.driver.wait(until.elementLocated(By.name('password')),5000);
 		await passwordBox.sendKeys(this.password)
-    await this.driver.sleep(1000)
+    await this.driver.sleep(500)
     
     debug(`user agent: ${await this.driver.executeScript("return navigator.userAgent")}`)
     this.driver.takeScreenshot().then(function (base64Image) {
         var decodedImage = new Buffer(base64Image, 'base64');
         fs.writeFile('before_login.jpg', decodedImage, function(err) {});
-        debug(`Took before log in screenshot ${new Date()}`);
+        debug('Took before log in screenshot');
     });
     
 		await passwordBox.submit();
-    debug(`submitted log in information ${new Date()}`)
+    debug('submitted log in information')
     //wait to see which page it ends up at. Check url.
     try {
       await this.driver.wait(until.elementLocated(By.linkText('Log out')),3000)
     } catch (e) {
       // ignore timeout errors
-      debug(`timed out waiting for log in link ${new Date()}`)
+      debug('timed out waiting for log in link')
     }
     
     this.driver.takeScreenshot().then(function (base64Image) {
@@ -101,11 +102,7 @@ class VenmoAPI {
     await authCodeElement.submit();
     
     // Wait for a few seconds to avoid stale element error. TODO Find proper way of waiting. https://stackoverflow.com/questions/5709204/random-element-is-no-longer-attached-to-the-dom-staleelementreferenceexception
-    try {
-      await this.driver.wait(until.elementLocated(By.name('rhubarb')),5000)
-    } catch (e) {
-      //do nothing
-    }
+    this.driver.sleep(5000);
     
     let rememberButton = await this.driver.wait(
 			until.elementLocated(By.css('button.auth-button')),10000);

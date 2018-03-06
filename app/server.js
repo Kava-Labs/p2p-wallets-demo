@@ -120,7 +120,7 @@ async function sendMoneyVenmo(destinationUsername, amount) {
         return
     }
     console.log('Sending money by venmo.')
-    await venmo.sendMoney(destinationUsername, amount)
+    await venmo.sendMoney(destinationUsername, amount, ' an ILP transfer by Kava')
     // await venmo.disconnect() TODO disconnect on shutdown somehow
 }
 
