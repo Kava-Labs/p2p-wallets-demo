@@ -1,1 +1,1 @@
-web: npm start
+web: source ./local-proxy.sh & npm start

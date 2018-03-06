@@ -1,0 +1,1 @@
+node ./node_modules/proxy-login-automator/proxy-login-automator.js -local_port 8081 -remote_host zproxy.luminati.io -remote_port 22225 -usr $PROXY_USER -pwd $PROXY_PASSWORD

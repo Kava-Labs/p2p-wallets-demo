@@ -14,7 +14,7 @@ const {Builder, By, Key, until} = require('selenium-webdriver');
 const Chrome = require('selenium-webdriver/chrome');
 //var path = require('chromedriver').path;
 const CHROME_EXECUTABLE = process.env.GOOGLE_CHROME_BIN
-const CHROME_PROXY = process.env.QUOTAGUARD_URL
+const CHROME_PROXY = process.env.CHROME_PROXY
 
 //These are needed when using the chromedriver npm package. Switching to using brew chromedriver for now.
 //var service = new Chrome.ServiceBuilder(path).build();
@@ -130,7 +130,7 @@ class VenmoAPI {
     options.addArguments(`user-agent="${safeUserAgent}"`)
     // with headless chrome, UA is 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/64.0.3282.186 Safari/537.36'
     options.addArguments('headless','disable-gpu','no-sandbox') // add arguments provided by the SHIM https://github.com/heroku/heroku-buildpack-google-chrome
-    options.addArguments(`proxy-server="${CHROME_PROXY}"`) // routing chrome through a proxy https://www.systutorials.com/qa/247/how-to-set-google-chromes-proxy-settings-command-line-linux
+    options.addArguments(`proxy-server=${CHROME_PROXY}`) // routing chrome through a proxy https://www.systutorials.com/qa/247/how-to-set-google-chromes-proxy-settings-command-line-linux
 		debug('added arguments to chrome')
     
 		this.driver = await new Builder()
