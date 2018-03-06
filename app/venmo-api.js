@@ -14,6 +14,7 @@ const {Builder, By, Key, until} = require('selenium-webdriver');
 const Chrome = require('selenium-webdriver/chrome');
 //var path = require('chromedriver').path;
 const CHROME_EXECUTABLE = process.env.GOOGLE_CHROME_BIN
+const CHROME_PROXY = process.env.QUOTAGUARD_URL
 
 //These are needed when using the chromedriver npm package. Switching to using brew chromedriver for now.
 //var service = new Chrome.ServiceBuilder(path).build();
@@ -31,7 +32,7 @@ class VenmoAPI {
 	async login() {
 		await this.driver.get('https://venmo.com/account/sign-in');
     
-    await this.driver.sleep(3000);
+    await this.driver.sleep(10000);
     this.driver.takeScreenshot().then(function (base64Image) {
         var decodedImage = new Buffer(base64Image, 'base64');
         fs.writeFile('after_login_load.jpg', decodedImage, function(err) {});
@@ -128,7 +129,8 @@ class VenmoAPI {
     const safeUserAgent='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36'
     options.addArguments(`user-agent="${safeUserAgent}"`)
     // with headless chrome, UA is 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/64.0.3282.186 Safari/537.36'
-    options.addArguments('headless','disable-gpu','no-sandbox') // add arguments provided by the SHIM
+    options.addArguments('headless','disable-gpu','no-sandbox') // add arguments provided by the SHIM https://github.com/heroku/heroku-buildpack-google-chrome
+    options.addArguments(`proxy-server="${CHROME_PROXY}"`) // routing chrome through a proxy https://www.systutorials.com/qa/247/how-to-set-google-chromes-proxy-settings-command-line-linux
 		debug('added arguments to chrome')
     
 		this.driver = await new Builder()
