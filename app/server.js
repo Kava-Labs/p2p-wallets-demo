@@ -87,7 +87,8 @@ function requestMoneyPaypal(api, receiver_email, amount, currency='USD') {
     // Create the invoice
     api.invoice.create(create_invoice_json, function (error, invoice) {
         if (error) {
-            throw error;
+            console.log(error);
+            //throw error;
         } else {
             console.log("Create Invoice Response");
             console.log(invoice.id)
@@ -95,7 +96,7 @@ function requestMoneyPaypal(api, receiver_email, amount, currency='USD') {
             api.invoice.send(invoice.id, function (error, rv) {
                 if (error) {
                     console.log(error.response);
-                    throw error;
+                    //throw error;
                 } else {
                     console.log("Send Invoice Response");
                     console.log(rv);
