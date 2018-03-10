@@ -5,6 +5,9 @@ const bodyParser = require('body-parser');
 const basicAuth = require('express-basic-auth')
 const PORT = process.env.PORT || 5000 // default `heroku local` port
 const app = express()
+const assert = require('assert');
+global.fetch = require('node-fetch')
+const cc = require('cryptocompare')
 
 // Paypal info
 const paypal = require('paypal-rest-sdk');
@@ -19,6 +22,21 @@ const venmo_email = process.env.VENMO_EMAIL
 const venmo_pass = process.env.VENMO_PASS
 
 const venmo = new VenmoAPI(venmo_email, venmo_pass)
+
+// Ripple info
+const RippleAPI = require('ripple-lib').RippleAPI;
+// Define these in your PATH
+const connectorXrpAddr = process.env.XRP_ADDR;
+const connectorXrpSecret = process.env.XRP_SECRET;
+// Ripple API specific constants
+/* Milliseconds to wait between checks for a new ledger. */
+const INTERVAL = 1000;
+/* Instantiate RippleAPI. Uses s2 (full history server) */
+const ripple_api = new RippleAPI({server: 'wss://s2.ripple.com'});
+/* Number of ledgers to check for valid transaction before failing */
+const ledgerOffset = 5;
+const xrpPaymentInstructions = {maxLedgerVersionOffset: ledgerOffset};
+
 
 paypal.configure({
   'mode': 'live', //sandbox or live
@@ -125,6 +143,71 @@ async function sendMoneyVenmo(destinationUsername, amount) {
     // await venmo.disconnect() TODO disconnect on shutdown somehow
 }
 
+/* Define the payment to make here */
+function preparePaymentXRP(source_addr, dest_addr, amount, currency="XRP"){
+  var paymentTx = {
+    "source": {
+      "address": source_addr,
+      "maxAmount": {
+        "value": String(amount),
+        "currency": currency
+      }
+    },
+    "destination": {
+      "address": dest_addr,
+      "amount": {
+        "value": String(amount),
+        "currency": currency,
+      }
+    }
+  }
+  return paymentTx;
+}
+
+/* Verify a transaction is in a validated XRP Ledger version */
+function verifyXrpTransaction(hash, options) {
+  console.log('Verifing Transaction');
+  return ripple_api.getTransaction(hash, options).then(data => {
+    console.log('Final Result: ', data.outcome.result);
+    console.log('Validated in Ledger: ', data.outcome.ledgerVersion);
+    console.log('Sequence: ', data.sequence);
+    return data.outcome.result === 'tesSUCCESS';
+  }).catch(error => {
+    /* If transaction not in latest validated ledger,
+       try again until max ledger hit */
+    if (error instanceof ripple_api.errors.PendingLedgerVersionError) {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => verifyXrpTransaction(hash, options)
+        .then(resolve, reject), INTERVAL);
+      });
+    }
+    return error;
+  });
+}
+
+
+/* Function to prepare, sign, and submit a transaction to the XRP Ledger. */
+function submitXrpTransaction(lastClosedLedgerVersion, prepared, secret) {
+  const signedData = ripple_api.sign(prepared.txJSON, secret);
+  return ripple_api.submit(signedData.signedTransaction).then(data => {
+    console.log('Tentative Result: ', data.resultCode);
+    console.log('Tentative Message: ', data.resultMessage);
+    /* If transaction was not successfully submitted throw error */
+    assert.strictEqual(data.resultCode, 'tesSUCCESS');
+    /* 'tesSUCCESS' means the transaction is being considered for the next ledger, and requires validation. */
+
+    /* If successfully submitted, begin validation workflow */
+    const options = {
+      minLedgerVersion: lastClosedLedgerVersion,
+      maxLedgerVersion: prepared.instructions.maxLedgerVersion
+    };
+    return new Promise((resolve, reject) => {
+      setTimeout(() => verifyXrpTransaction(signedData.id, options)
+    .then(resolve, reject), INTERVAL);
+    });
+  });
+}
+
 
 app.use(express.static(path.resolve(__dirname + '/public')));
 app.use(bodyParser.urlencoded({ extended: true })); // an epxress middleware that allows enables use of `req.body` to access parameters passed in url
@@ -163,10 +246,34 @@ app.post('/', function (req, res) {
     console.log("Requesting paypal payment")
     requestMoneyPaypal(paypal, req.body.send_account, req.body.amount)
     // wait a bit before sending venmo payment
+    }
+  if (req.body.to == 'venmo' && req.body.amount < 1.0){
     setTimeout(() => {
       console.log("Sending venmo payment")
       sendMoneyVenmo(req.body.receive_account, req.body.amount)
     },10000)
+  }
+  if (req.body.to == 'ripple' && req.body.amount <1.0) {
+    cc.price('USD', 'XRP')
+    .then(prices => {
+      console.log(req.body.amount * prices['XRP'])
+      var xrp_payment = preparePaymentXRP(connectorXrpAddr, req.body.receive_account, req.body.amount * prices['XRP'])
+      ripple_api.connect().then(() => {
+          console.log('Connected');
+          return ripple_api.preparePayment(connectorXrpAddr, xrp_payment, xrpPaymentInstructions);
+        }).then(prepared => {
+          console.log('Payment Prepared');
+          return ripple_api.getLedger().then(ledger => {
+            console.log('Current Ledger', ledger.ledgerVersion);
+            return submitXrpTransaction(ledger.ledgerVersion, prepared, connectorXrpSecret);
+          });
+        }).then(() => {
+          ripple_api.disconnect().then(() => {
+            console.log('Ripple api disconnected');
+            process.exit();
+          });
+        }).catch(console.error);
+    }).catch(console.error)
     }
   console.log('sending payment');
 	// TODO trigger an ILP payment
