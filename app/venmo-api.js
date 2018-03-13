@@ -124,8 +124,11 @@ class VenmoAPI {
     const safeUserAgent='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36'
     options.addArguments(`user-agent="${safeUserAgent}"`)
     // with headless chrome, UA is 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/64.0.3282.186 Safari/537.36'
-    // TODO add option to remove headless arg
-    options.addArguments('headless','disable-gpu','no-sandbox') // add arguments provided by the SHIM https://github.com/heroku/heroku-buildpack-google-chrome
+    if (HEADLESS) {
+      options.addArguments('headless')
+      options.windowSize({width: 1280, height: 800})
+    }
+    options.addArguments('disable-gpu','no-sandbox') // add arguments provided by the SHIM https://github.com/heroku/heroku-buildpack-google-chrome
     options.addArguments(`proxy-server=${CHROME_PROXY}`) // routing chrome through a proxy https://www.systutorials.com/qa/247/how-to-set-google-chromes-proxy-settings-command-line-linux
 		debug('added arguments to chrome')
     
