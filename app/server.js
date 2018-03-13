@@ -33,7 +33,7 @@ const connectorXrpSecret = process.env.XRP_SECRET;
 const INTERVAL = 1000;
 /* Instantiate RippleAPI. Uses s2 (full history server) */
 // Test net: 'wss://s.altnet.rippletest.net:51233'
-const ripple_api = new RippleAPI({server: 'wss://s2.ripple.com'});
+const ripple_api = new RippleAPI({server: 'wss://s.altnet.rippletest.net:51233'});
 /* Number of ledgers to check for valid transaction before failing */
 const ledgerOffset = 5;
 const xrpPaymentInstructions = {maxLedgerVersionOffset: ledgerOffset};
@@ -213,6 +213,25 @@ function submitXrpTransaction(lastClosedLedgerVersion, prepared, secret) {
 }
 
 
+async function sendMoneyXrp(amount,receive_account) {
+  let prices = await cc.price('USD', 'XRP')
+  console.log(amount * prices['XRP'])
+  
+  let xrp_payment = preparePaymentXRP(connectorXrpAddr, receive_account, amount * prices['XRP'])
+  await ripple_api.connect()
+  console.log('Connected');
+  let prepared = await ripple_api.preparePayment(connectorXrpAddr, xrp_payment, xrpPaymentInstructions);
+  console.log('Payment Prepared');
+  
+  let ledger = await ripple_api.getLedger()
+  console.log('Current Ledger', ledger.ledgerVersion);
+  await submitXrpTransaction(ledger.ledgerVersion, prepared, connectorXrpSecret);
+  
+  await ripple_api.disconnect()
+  console.log('Ripple api disconnected');
+}
+
+
 app.use(express.static(path.resolve(__dirname + '/public')));
 app.use(bodyParser.urlencoded({ extended: true })); // an epxress middleware that allows enables use of `req.body` to access parameters passed in url
 app.set('view engine', 'ejs')
@@ -250,39 +269,21 @@ app.post('/', function (req, res) {
   if (req.body.from == 'paypal' && req.body.amount < 1.0) {
     console.log("Requesting paypal payment")
     requestMoneyPaypal(paypal, req.body.send_account, req.body.amount)
-    // wait a bit before sending venmo payment
     }
   if (req.body.to == 'venmo' && req.body.amount < 1.0){
+    // wait a bit before sending venmo payment
     setTimeout(() => {
       console.log("Sending venmo payment")
       sendMoneyVenmo(req.body.receive_account, req.body.amount)
     },10000)
   }
   if (req.body.to == 'ripple' && req.body.amount <1.0) {
-    cc.price('USD', 'XRP')
-    .then(prices => {
-      console.log(req.body.amount * prices['XRP'])
-      var xrp_payment = preparePaymentXRP(connectorXrpAddr, req.body.receive_account, req.body.amount * prices['XRP'])
-      ripple_api.connect().then(() => {
-          console.log('Connected');
-          return ripple_api.preparePayment(connectorXrpAddr, xrp_payment, xrpPaymentInstructions);
-        }).then(prepared => {
-          console.log('Payment Prepared');
-          return ripple_api.getLedger().then(ledger => {
-            console.log('Current Ledger', ledger.ledgerVersion);
-            return submitXrpTransaction(ledger.ledgerVersion, prepared, connectorXrpSecret);
-          });
-        }).then(() => {
-          ripple_api.disconnect().then(() => {
-            console.log('Ripple api disconnected');
-            process.exit();
-          });
-        }).catch(console.error);
-    }).catch(console.error)
-    }
+    console.log("Sending XRP payment")
+    sendMoneyXrp(req.body.amount, req.body.receive_account)
+  }
   console.log('sending payment');
-	// TODO trigger an ILP payment
-	res.render('payment-processing', {from: req.body.from, to: req.body.to, user: req.auth.user});  
+  
+  res.render('payment-processing', {from: req.body.from, to: req.body.to, user: req.auth.user});  
 })
 
 app.get('/venmo-2fa', function (req, res) {
