@@ -60,7 +60,7 @@ class VenmoAPI {
   async login() {
     await this.driver.get('https://venmo.com/account/sign-in');
 
-    await this.driver.sleep(3000); //TODO replace with `wait(until.titleIs` to detect when page has loaded
+    await this.driver.wait(until.titleIs("Venmo"),5000)
 
     this.driver.takeScreenshot().then(function (base64Image) {
         var decodedImage = new Buffer(base64Image, 'base64');
