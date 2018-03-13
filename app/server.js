@@ -32,6 +32,7 @@ const connectorXrpSecret = process.env.XRP_SECRET;
 /* Milliseconds to wait between checks for a new ledger. */
 const INTERVAL = 1000;
 /* Instantiate RippleAPI. Uses s2 (full history server) */
+// Test net: 'wss://s.altnet.rippletest.net:51233'
 const ripple_api = new RippleAPI({server: 'wss://s2.ripple.com'});
 /* Number of ledgers to check for valid transaction before failing */
 const ledgerOffset = 5;
@@ -241,6 +242,7 @@ app.post('/', function (req, res) {
   console.log(req.body.to);
   console.log(req.body.receive_account)
   console.log(req.body.amount);
+  // TODO move $1 cap to validation code
   // Naive way of sending payments:
   if (req.body.from == 'paypal' && req.body.amount < 1.0) {
     console.log("Requesting paypal payment")
