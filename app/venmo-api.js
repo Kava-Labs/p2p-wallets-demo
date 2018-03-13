@@ -57,7 +57,7 @@ class VenmoAPI {
     debug('submitted log in information')
     //wait to see which page it ends up at. Check url.
     try {
-      await this.driver.wait(until.elementLocated(By.linkText('Log out')),3000)
+      await this.driver.wait(until.elementLocated(By.linkText('Log out')),3000) // TODO find more reliable way of testing whether logged in or not
     } catch (e) {
       // ignore timeout errors
       debug('timed out waiting for log in link')
@@ -72,32 +72,32 @@ class VenmoAPI {
     let url = await this.driver.getCurrentUrl()
     debug(`Url of page after log in attempt: ${url}`)
     if (url.toString() == 'https://venmo.com/account/mfa/code-prompt') {
-      console.log('Venmo requires 2 factor authorization.')
-      throw 'mfa error'
+      throw new Error('Venmo requires 2 factor authorization.')
     } else {
-      // if mfa then throw else continue
       this.lastLogInTime = Date.now()
     }
 	}
   
   async send2FactorCode() {
-    // assumes it's already at the right page
-    //await this.driver.get('https://venmo.com/account/mfa/code-prompt')
     try {
-      debug('logging in in order to send mfa code')
+      debug('logging in in order to send 2fa code')
       await this.login()
     } catch (e) {
-      // ignore mfa error
-      debug(`error in logging in: ${e}`)
+      if (e.message === 'Venmo requires 2 factor authorization.'){ //TODO create custom error instead of relying on message
+        debug('caught 2fa login error as expected')
+      } else {
+        throw e
+      }
     }
-    debug('finding send mfa code button and clicking it')
+    debug('finding send 2fa code button and clicking it')
     await this.driver.findElement(By.css('button.mfa-button-code-prompt')).click()
   }
   
   async submit2FactorAuth(authCode) {
-    // assumes it's already at the right page
+    // assumes it's already at the right page left after running send2FactorCode
     let authCodeElement = await this.driver.wait(
 			until.elementLocated(By.name('token')),10000); //also class=auth-form-input
+    debug('submitting 2fa code')
     await authCodeElement.sendKeys(authCode);
     await authCodeElement.submit();
     
@@ -126,6 +126,7 @@ class VenmoAPI {
     const safeUserAgent='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36'
     options.addArguments(`user-agent="${safeUserAgent}"`)
     // with headless chrome, UA is 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/64.0.3282.186 Safari/537.36'
+    // TODO add option to remove headless arg
     options.addArguments('headless','disable-gpu','no-sandbox') // add arguments provided by the SHIM https://github.com/heroku/heroku-buildpack-google-chrome
     options.addArguments(`proxy-server=${CHROME_PROXY}`) // routing chrome through a proxy https://www.systutorials.com/qa/247/how-to-set-google-chromes-proxy-settings-command-line-linux
 		debug('added arguments to chrome')
@@ -135,9 +136,7 @@ class VenmoAPI {
 			.setChromeOptions(options)
 			.build();
 		
-    debug(`built chrome driver. Current page title: ${await this.driver.getTitle()}`)
-    
-		await this.login()
+    debug('built chrome driver')
 	}
 	
 	async sendMoney(destinationUsername, amount, paymentMessage) {
