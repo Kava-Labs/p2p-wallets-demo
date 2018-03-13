@@ -106,19 +106,20 @@ function requestMoneyPaypal(api, receiver_email, amount, currency='USD') {
     // Create the invoice
     api.invoice.create(create_invoice_json, function (error, invoice) {
         if (error) {
-            console.log(error);
+            debug(`error creating paypal invoice:`);
+            debug(error);
             //throw error;
         } else {
-            console.log("Create Invoice Response");
-            console.log(invoice.id)
+            debug(`create invoice response for invoice id ${invoice.id}`);
             // Send the invoice to the recicpient's email
             api.invoice.send(invoice.id, function (error, rv) {
                 if (error) {
-                    console.log(error.response);
+                  debug('error creating paypal invoice response:')
+                    debug(error.response);
                     //throw error;
                 } else {
-                    console.log("Send Invoice Response");
-                    console.log(rv);
+                    debug('sent paypal invoice response:');
+                    debug(rv);
                 }
             });
         }
@@ -128,18 +129,18 @@ function requestMoneyPaypal(api, receiver_email, amount, currency='USD') {
 async function sendMoneyVenmo(destinationUsername, amount) {
   const venmo = new VenmoAPI(venmo_email, venmo_pass)
   try {
-    console.log('Connecting venmo API.')
+    debug('connecting venmo API')
     await venmo.connect()
-    console.log('Logging into venmo.')
+    debug('logging into venmo')
     await venmo.login()
     
-    console.log('Getting venmo balance.')
+    debug('getting venmo balance')
     let balance = await venmo.getBalance()
     if (balance < amount) {
-        console.log("Insufficient funds.")
+        debug('insufficient funds')
         return
     }
-    console.log('Sending money by venmo.')
+    debug('sending money by venmo')
     await venmo.sendMoney(destinationUsername, amount, 'an ILP transfer by Kava')
     
   } finally {
@@ -170,11 +171,11 @@ function preparePaymentXRP(source_addr, dest_addr, amount, currency="XRP"){
 
 /* Verify a transaction is in a validated XRP Ledger version */
 function verifyXrpTransaction(hash, options) {
-  console.log('Verifing Transaction');
+  debug('Verifing Transaction');
   return ripple_api.getTransaction(hash, options).then(data => {
-    console.log('Final Result: ', data.outcome.result);
-    console.log('Validated in Ledger: ', data.outcome.ledgerVersion);
-    console.log('Sequence: ', data.sequence);
+    debug(`Final Result: ${data.outcome.result}`);
+    debug(`Validated in Ledger: ${data.outcome.ledgerVersion}`);
+    debug(`Sequence: ${data.sequence}`);
     return data.outcome.result === 'tesSUCCESS';
   }).catch(error => {
     /* If transaction not in latest validated ledger,
@@ -194,8 +195,8 @@ function verifyXrpTransaction(hash, options) {
 function submitXrpTransaction(lastClosedLedgerVersion, prepared, secret) {
   const signedData = ripple_api.sign(prepared.txJSON, secret);
   return ripple_api.submit(signedData.signedTransaction).then(data => {
-    console.log('Tentative Result: ', data.resultCode);
-    console.log('Tentative Message: ', data.resultMessage);
+    debug(`tentative result: ${data.resultCode}`);
+    debug(`tentative message: ${data.resultMessage}`);
     /* If transaction was not successfully submitted throw error */
     assert.strictEqual(data.resultCode, 'tesSUCCESS');
     /* 'tesSUCCESS' means the transaction is being considered for the next ledger, and requires validation. */
@@ -215,20 +216,20 @@ function submitXrpTransaction(lastClosedLedgerVersion, prepared, secret) {
 
 async function sendMoneyXrp(amount,receive_account) {
   let prices = await cc.price('USD', 'XRP')
-  console.log(amount * prices['XRP'])
+  debug(`sending ${amount * prices['XRP']}XRP`)
   
   let xrp_payment = preparePaymentXRP(connectorXrpAddr, receive_account, amount * prices['XRP'])
   await ripple_api.connect()
-  console.log('Connected');
+  debug('ripple api connected');
   let prepared = await ripple_api.preparePayment(connectorXrpAddr, xrp_payment, xrpPaymentInstructions);
-  console.log('Payment Prepared');
+  debug('xrp payment prepared');
   
   let ledger = await ripple_api.getLedger()
-  console.log('Current Ledger', ledger.ledgerVersion);
+  debug(`current xrp ledger: ${ledger.ledgerVersion}`);
   await submitXrpTransaction(ledger.ledgerVersion, prepared, connectorXrpSecret);
   
   await ripple_api.disconnect()
-  console.log('Ripple api disconnected');
+  debug('ripple api disconnected');
 }
 
 
@@ -251,37 +252,30 @@ app.get('/', function (req, res) {
   res.render('index', {result: null, user: req.auth.user});
 })
 
-/*
-app.get('/login', function (req, res) {
-  res.render('login');
-})
-*/
+
 
 app.post('/', function (req, res) {
   // TODO sanitize inputs
-  console.log(req.body.from);
-  console.log(req.body.send_account)
-  console.log(req.body.to);
-  console.log(req.body.receive_account)
-  console.log(req.body.amount);
+  debug(`processing request to send $${req.body.amount}
+         from ${req.body.from} (${req.body.send_account})
+         to ${req.body.to} (${req.body.receive_account})`);
   // TODO move $1 cap to validation code
   // Naive way of sending payments:
   if (req.body.from == 'paypal' && req.body.amount < 1.0) {
-    console.log("Requesting paypal payment")
+    debug("requesting paypal payment")
     requestMoneyPaypal(paypal, req.body.send_account, req.body.amount)
     }
   if (req.body.to == 'venmo' && req.body.amount < 1.0){
     // wait a bit before sending venmo payment
     setTimeout(() => {
-      console.log("Sending venmo payment")
+      debug("sending venmo payment")
       sendMoneyVenmo(req.body.receive_account, req.body.amount)
     },10000)
   }
   if (req.body.to == 'ripple' && req.body.amount <1.0) {
-    console.log("Sending XRP payment")
+    debug("sending XRP payment")
     sendMoneyXrp(req.body.amount, req.body.receive_account)
   }
-  console.log('sending payment');
   
   res.render('payment-processing', {from: req.body.from, to: req.body.to, user: req.auth.user});  
 })
@@ -292,8 +286,9 @@ app.get('/venmo-2fa', function (req, res) {
 
 app.post('/venmo-2fa', async function (req, res) {
   venmo2faApiInstance = new VenmoAPI(venmo_email, venmo_pass)
-  console.log('connecting')
+  debug(`connecting to venmo`)
   await venmo2faApiInstance.connect()
+  debug('sending 2fa code')
   await venmo2faApiInstance.send2FactorCode()
   res.redirect('/venmo-2fa/submit')
 })
@@ -303,7 +298,7 @@ app.get('/venmo-2fa/submit', function (req, res) {
 })
 
 app.post('/venmo-2fa/submit', async function (req, res) {
-  console.log(req.body.auth_code)
+  debug(`got auth code ${req.body.auth_code}, submitting`)
   await venmo2faApiInstance.submit2FactorAuth(req.body.auth_code)
   await venmo2faApiInstance.disconnect()
   res.redirect('/');
