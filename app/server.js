@@ -48,82 +48,82 @@ paypal.configure({
 
 function requestMoneyPaypal(api, receiver_email, amount, currency='USD') {
 // Create an invoice JSON object
-    var create_invoice_json = {
-        "merchant_info": {
-            "email": "connector@kava.io",
-            "first_name": "Kava",
-            "last_name": "Konnector",
-            "business_name": "Kava Labs, Inc.",
-            "phone": {
-                "country_code": "001",
-                "national_number": "5555555555"
-            },
-            "address": {
-                "line1": "1234 Main St.",
-                "city": "Portland",
-                "state": "OR",
-                "postal_code": "97217",
-                "country_code": "US"
-            }
-        },
-        "billing_info": [{
-            "email": receiver_email
-        }],
-        "items": [{
-            "name": "Transfers",
-            "quantity": 1.0,
-            "unit_price": {
-                "currency": "USD",
-                "value": amount
-            }
-        }],
-        "note": "Kava Konnector Services",
-        "payment_term": {
-            "term_type": "NET_45"
-        },
-        "shipping_info": {
-            "first_name": "NA",
-            "last_name": "NA",
-            "business_name": "Not applicable",
-            "phone": {
-                "country_code": "001",
-                "national_number": "5039871234"
-            },
-            "address": {
-                "line1": "NA",
-                "city": "NA",
-                "state": "NA",
-                "postal_code": "NA",
-                "country_code": "NA"
-            }
-        },
-        "tax_inclusive": true,
-        "total_amount": {
-            "currency": currency,
-            "value": amount
-        }
-    };
-    // Create the invoice
-    api.invoice.create(create_invoice_json, function (error, invoice) {
+  var create_invoice_json = {
+      "merchant_info": {
+          "email": "connector@kava.io",
+          "first_name": "Kava",
+          "last_name": "Konnector",
+          "business_name": "Kava Labs, Inc.",
+          "phone": {
+              "country_code": "001",
+              "national_number": "5555555555"
+          },
+          "address": {
+              "line1": "1234 Main St.",
+              "city": "Portland",
+              "state": "OR",
+              "postal_code": "97217",
+              "country_code": "US"
+          }
+      },
+      "billing_info": [{
+          "email": receiver_email
+      }],
+      "items": [{
+          "name": "Transfers",
+          "quantity": 1.0,
+          "unit_price": {
+              "currency": "USD",
+              "value": amount
+          }
+      }],
+      "note": "Kava Konnector Services",
+      "payment_term": {
+          "term_type": "NET_45"
+      },
+      "shipping_info": {
+          "first_name": "NA",
+          "last_name": "NA",
+          "business_name": "Not applicable",
+          "phone": {
+              "country_code": "001",
+              "national_number": "5039871234"
+          },
+          "address": {
+              "line1": "NA",
+              "city": "NA",
+              "state": "NA",
+              "postal_code": "NA",
+              "country_code": "NA"
+          }
+      },
+      "tax_inclusive": true,
+      "total_amount": {
+          "currency": currency,
+          "value": amount
+      }
+  };
+  // Create the invoice
+  api.invoice.create(create_invoice_json, function (error, invoice) {
+    if (error) {
+      debug(`error creating paypal invoice:`);
+      debug(error);
+      //throw error;
+    } else {
+      debug(`create invoice response for invoice id ${invoice.id}`);
+      // Send the invoice to the recicpient's email
+      api.invoice.send(invoice.id, function (error, rv) {
         if (error) {
-            debug(`error creating paypal invoice:`);
-            debug(error);
-            //throw error;
+          debug('error creating paypal invoice response:')
+          debug(error.response);
+          //throw error;
         } else {
-            debug(`create invoice response for invoice id ${invoice.id}`);
-            // Send the invoice to the recicpient's email
-            api.invoice.send(invoice.id, function (error, rv) {
-                if (error) {
-                  debug('error creating paypal invoice response:')
-                    debug(error.response);
-                    //throw error;
-                } else {
-                    debug('sent paypal invoice response:');
-                    debug(rv);
-                }
-            });
+          debug('sent paypal invoice response:');
+          debug(rv);
         }
-    });
+      });
+    }
+  });
 }
 
 async function sendMoneyVenmo(destinationUsername, amount) {
@@ -137,8 +137,8 @@ async function sendMoneyVenmo(destinationUsername, amount) {
     debug('getting venmo balance')
     let balance = await venmo.getBalance()
     if (balance < amount) {
-        debug('insufficient funds')
-        return
+      debug('insufficient funds')
+      return
     }
     debug('sending money by venmo')
     await venmo.sendMoney(destinationUsername, amount, 'an ILP transfer by Kava')
@@ -240,12 +240,12 @@ app.set('views',path.resolve(__dirname + '/views'))
 
 
 app.use(basicAuth({
-	users: {
-		'ruaridh': process.env.RUARIDHS_PASSWORD,
-		'kevin': process.env.KEVINS_PASSWORD,
-        'kava': process.env.KAVA_PASSWORD},
-	challenge: true,
-	realm: 'PRunzwXZhi4UFhWuwCTAwGZ',
+  users: {
+    'ruaridh': process.env.RUARIDHS_PASSWORD,
+    'kevin': process.env.KEVINS_PASSWORD,
+    'kava': process.env.KAVA_PASSWORD},
+  challenge: true,
+  realm: 'PRunzwXZhi4UFhWuwCTAwGZ',
 }))
 
 app.get('/', function (req, res) {
