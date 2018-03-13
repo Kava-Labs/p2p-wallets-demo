@@ -15,6 +15,7 @@ const Chrome = require('selenium-webdriver/chrome');
 //var path = require('chromedriver').path;
 const CHROME_EXECUTABLE = process.env.GOOGLE_CHROME_BIN
 const CHROME_PROXY = process.env.CHROME_PROXY
+const HEADLESS = JSON.parse(process.env.HEADLESS) // convert string to boolean
 
 //These are needed when using the chromedriver npm package. Switching to using brew chromedriver for now.
 //var service = new Chrome.ServiceBuilder(path).build();
@@ -112,13 +113,10 @@ class VenmoAPI {
     //await login()
   }
 	
-	async connect(headless=true) {
+	async connect() {
 		debug('connecting venmo api')
     debug(`google_chrome_shim:${process.env.GOOGLE_CHROME_SHIM}, google_chrom_bin:${process.env.GOOGLE_CHROME_BIN}`)
 		let options = new Chrome.Options()
-		if (headless) {
-			options.headless().windowSize({width: 640, height: 480})
-		}
 		if (CHROME_EXECUTABLE) {
 			debug('changing chrome path')
 			options.setChromeBinaryPath(CHROME_EXECUTABLE)
