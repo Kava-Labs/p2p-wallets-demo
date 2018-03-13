@@ -32,8 +32,8 @@ const connectorXrpSecret = process.env.XRP_SECRET;
 /* Milliseconds to wait between checks for a new ledger. */
 const INTERVAL = 1000;
 /* Instantiate RippleAPI. Uses s2 (full history server) */
-// Test net: 'wss://s.altnet.rippletest.net:51233'
-const ripple_api = new RippleAPI({server: 'wss://s.altnet.rippletest.net:51233'});
+const rippleServer = process.env.RIPPLE_SERVER || 'wss://s2.ripple.com' // Test net: 'wss://s.altnet.rippletest.net:51233'
+const ripple_api = new RippleAPI({server: rippleServer});
 /* Number of ledgers to check for valid transaction before failing */
 const ledgerOffset = 5;
 const xrpPaymentInstructions = {maxLedgerVersionOffset: ledgerOffset};
@@ -216,7 +216,7 @@ function submitXrpTransaction(lastClosedLedgerVersion, prepared, secret) {
 
 async function sendMoneyXrp(amount,receive_account) {
   let prices = await cc.price('USD', 'XRP')
-  debug(`sending ${amount * prices['XRP']}XRP`)
+  debug(`sending ${amount * prices['XRP']} XRP`)
   
   let xrp_payment = preparePaymentXRP(connectorXrpAddr, receive_account, amount * prices['XRP'])
   await ripple_api.connect()
