@@ -103,12 +103,12 @@ class VenmoAPI {
     await authCodeElement.submit();
     
     // Wait for a few seconds to avoid stale element error. TODO Find proper way of waiting. https://stackoverflow.com/questions/5709204/random-element-is-no-longer-attached-to-the-dom-staleelementreferenceexception
-    this.driver.sleep(5000);
+    await this.driver.sleep(5000);
     
     let rememberButton = await this.driver.wait(
 			until.elementLocated(By.css('button.auth-button')),10000);
     
-    debug('found button, clicking..')
+    debug('found remember button, clicking')
     await rememberButton.click()
     //await login()
   }
